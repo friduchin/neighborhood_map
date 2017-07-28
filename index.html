@@ -4,15 +4,22 @@
     <title>Neighborhood Map</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
     <link rel="stylesheet" href="style.css">
   </head>
   <body>
-    <h1>Neighborhood Map: Visit New York</h1>
-    <div id="map"></div>
+      <div class="col-md-3 list">
+        <h2>Neighborhood Map: Visit New York</h1>
+        <div class="list-group" data-bind="foreach: placeList">
+          <button type="button" class="list-group-item list-group-item-action" data-bind="text: name"></button>
+        </div>
+      </div>
+      <div class="col-md-9" id="map"></div>
     <script defer
       src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA3fPYzJUge2eDc6UlTvcd_xMA_0IhHsv4&v=3&callback=initMap"
       onerror="mapError()">
     </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.4.2/knockout-min.js"></script>
     <script src="app.js"></script>
   </body>
 </html>

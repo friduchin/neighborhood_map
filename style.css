@@ -1,7 +1,11 @@
-html, body {
+html, body, #map, .list, .list-group {
   height: 100%;
 }
 
-#map {
-  height: 100%;
+.list {
+  overflow-y: hidden;
+}
+
+.list-group {
+  overflow-y: auto;
 }
