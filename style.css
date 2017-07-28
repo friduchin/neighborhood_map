@@ -1,11 +1,16 @@
-html, body, #map, .list, .list-group {
+html, body, #map, .panel {
   height: 100%;
 }
 
-.list {
-  overflow-y: hidden;
+.panel {
+  padding: 0;
+}
+
+.panel-heading {
+  height: 8em;
 }
 
 .list-group {
-  overflow-y: auto;
+  overflow: auto;
+  max-height: calc(100% - 8em);
 }
