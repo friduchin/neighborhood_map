@@ -10,7 +10,12 @@ html, body, #map, .panel {
   height: 8em;
 }
 
+.navbar {
+  height: 2em;
+  margin: 1px;
+}
+
 .list-group {
   overflow: auto;
-  max-height: calc(100% - 8em);
+  max-height: calc(100% - 8em - 2em);
 }
