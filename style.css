@@ -19,3 +19,12 @@ html, body, #map, .panel {
   overflow: auto;
   max-height: calc(100% - 8em - 2em);
 }
+
+#fsImg {
+  display: table;
+}
+
+#fsImg > img {
+  display: table-cell;
+  vertical-align: middle;
+}

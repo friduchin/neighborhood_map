@@ -39,7 +39,7 @@
         </nav>
 
         <div class="list-group" data-bind="foreach: placeList">
-          <button type="button" class="list-group-item list-group-item-action" data-bind="text: name"></button>
+          <button type="button" class="list-group-item list-group-item-action" data-bind="text: name, click: $parent.openInfoWindow.bind($data, $index())"></button>
         </div>
       </div>
       <div class="col-md-9" id="map"></div>

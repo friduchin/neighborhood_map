@@ -1,11 +1,13 @@
 var map;
 var markers = [];
+var infowindow;
 
 function initMap() {
     map = new google.maps.Map(document.getElementById('map'), {
         center: {lat: 40.7413549, lng: -73.9980244},
         zoom: 13
     });
+    infowindow = new google.maps.InfoWindow();
 
     (new ViewModel()).showMarkersForPlaces(places);
 }
@@ -62,33 +64,8 @@ var places = [
     },
     {
         type:'Museum',
-        name: 'National September 11 Memorial & Museum at the World Trade Center',
+        name: 'National September 11 Memorial',
         location: {lat: 40.711484, lng: -74.012725}
-    },
-    {
-        type: 'City district',
-        name: 'Upper East Side/East Harlem',
-        location: {lat: 40.79574, lng: -73.938921}
-    },
-    {
-        type: 'City district',
-        name: 'Times Square/Theater District',
-        location: {lat: 40.759011, lng: -73.984472}
-    },
-    {
-        type: 'City district',
-        name: 'Greenwich Village',
-        location: {lat: 40.733572, lng: -74.002742}
-    },
-    {
-        type: 'City district',
-        name: 'Meatpacking District',
-        location: {lat: 40.740987, lng: -74.007611}
-    },
-    {
-        type: 'City district',
-        name: 'Financial District',
-        location: {lat: 40.707491, lng: -74.011276}
     },
     {
         type: 'Pizza',
@@ -162,15 +139,17 @@ var ViewModel = function() {
             return mode == 'All places' || item.type == mode;
         }));
         self.hideMarkers();
+        markers = [];
         self.showMarkersForPlaces(self.placeList());
     };
 
     // This function will loop through the given places array to create an array of markers and display them
     self.showMarkersForPlaces = function (places) {
         var bounds = new google.maps.LatLngBounds();
-        for (var i = 0; i < places.length; i++) {
-            var position = places[i].location;
-            var title = places[i].name;
+
+        places.forEach(function(place, i) {
+            var position = place.location;
+            var title = place.name;
             // Create a marker per location, and put into markers array
             var marker = new google.maps.Marker({
                 map: map,
@@ -181,8 +160,12 @@ var ViewModel = function() {
             });
             // Push the marker to our array of markers
             markers.push(marker);
-            bounds.extend(markers[i].position);
-        }
+            bounds.extend(marker.position);
+            marker.addListener('click', function() {
+                self.openInfoWindow(i);
+            });
+        });
+
         // Extend the boundaries of the map for each marker
         map.fitBounds(bounds);
     };
@@ -193,6 +176,62 @@ var ViewModel = function() {
             markers[i].setMap(null);
         }
     };
+
+    // This function populates the infowindow when the marker is clicked
+    self.openInfoWindow = function(index) {
+        marker = markers[index];
+        infowindow.marker = marker;
+        var contentHtml = '<div class="row"><div id="fsInfo" class="col-md-8"><h4>' + marker.title + '</h4></div>';
+        contentHtml += '<div id="fsImg" class="col-md-4"></div></div>';
+        infowindow.setContent(contentHtml);
+        // Make sure the marker property and content are cleared if the infowindow is closed
+        infowindow.addListener('closeclick', function() {
+            infowindow.setContent('');
+            infowindow.marker = null;
+        });
+
+        // Basic Foursquare API request URL
+        var fsBasicUrl = 'https://api.foursquare.com/v2/venues/'
+        // Credentials for the Foursquare API request URL
+        var fsClientId = 'CXIHGWKSCCUBFJ0SXLYXOQ3JO0RUNRO3IFYENEHMP3ODKGZN';
+        var fsClientSecret = 'TE0AJG21AFZQOC5D3MUTTGGTU0FMMLQ12AASWLPJYCGLUSFK';
+        var fsVersion = '20170730';
+
+        function getFoursquarePlaceInfo(marker) {
+            $.getJSON(fsBasicUrl + 'search', {
+                client_id: fsClientId,
+                client_secret: fsClientSecret,
+                v: fsVersion,
+                intent: 'match',
+                query: marker.title,
+                ll: marker.position.lat() + ',' + marker.position.lng()
+            }).done(function(data) {
+                if (data.meta.code == 200 && data.response.venues.length > 0) {
+                    var place = data.response.venues[0];
+                    getFoursquarePlacePhoto(place.id);
+                    $('#fsInfo').append('<p>Foursquare info:</p><ul><li>' + place.location.formattedAddress[0] + '</li>'
+                        + '<li>' + place.url + '</li></ul>');
+                }
+            });
+        }
+
+        function getFoursquarePlacePhoto(placeId) {
+            $.getJSON(fsBasicUrl + placeId + '/photos', {
+                client_id: fsClientId,
+                client_secret: fsClientSecret,
+                v: fsVersion
+            }).done(function(data) {
+                if (data.response.photos.items.length > 0) {
+                    var photo = data.response.photos.items[0];
+                    $('#fsImg').html('<img src="' + photo.prefix + 'cap100' + photo.suffix + '">');
+                }
+            });
+        }
+
+        getFoursquarePlaceInfo(marker);
+        // Open the infowindow on the correct marker
+        infowindow.open(map, marker);
+    }
 };
 
 ko.applyBindings(new ViewModel());
