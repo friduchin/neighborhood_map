@@ -186,7 +186,13 @@ var ViewModel = function() {
 
     // This function populates the infowindow when the marker is clicked
     self.openInfoWindow = function(index, needToggleList = false) {
-        marker = markers[index];
+        // Remove bounce animation from any previously selected marker
+        markers.forEach(function(marker) { marker.setAnimation(null); });
+
+        var marker = markers[index];
+        // Add bounce animation for currently selected marker
+        marker.setAnimation(google.maps.Animation.BOUNCE);
+
         infowindow.marker = marker;
         var contentHtml = '<table class="table"><thead><h4>' + marker.title + '</h4></thead>'
         contentHtml += '<tbody><tr><td id="fsInfo" class="col-md-8"></td>';
@@ -194,6 +200,7 @@ var ViewModel = function() {
         infowindow.setContent(contentHtml);
         // Make sure the marker property and content are cleared if the infowindow is closed
         infowindow.addListener('closeclick', function() {
+            marker.setAnimation(null);
             infowindow.setContent('');
             infowindow.marker = null;
         });
