@@ -117,7 +117,7 @@ var places = [
         name: 'Le Bain at The Standard High Line',
         location: {lat: 40.740854, lng: -74.007952}
     }
-]
+];
 
 var ViewModel = function() {
     var self = this;
@@ -175,7 +175,7 @@ var ViewModel = function() {
         var panel = document.getElementById('list-panel');
         panel.classList.toggle('panel-active');
         self.placeListToggled = true;
-    }
+    };
 
     // This function will loop through the markers and hide them all
     self.hideMarkers = function() {
@@ -194,7 +194,7 @@ var ViewModel = function() {
         marker.setAnimation(google.maps.Animation.BOUNCE);
 
         infowindow.marker = marker;
-        var contentHtml = '<table class="table"><thead><h4>' + marker.title + '</h4></thead>'
+        var contentHtml = '<table class="table"><thead><h4>' + marker.title + '</h4></thead>';
         contentHtml += '<tbody><tr><td id="fsInfo" class="col-md-8"></td>';
         contentHtml += '<td id="fsImg" class="col-md-4"></td></tr></tbody></table>';
         infowindow.setContent(contentHtml);
@@ -206,7 +206,7 @@ var ViewModel = function() {
         });
 
         // Basic Foursquare API request URL
-        var fsBasicUrl = 'https://api.foursquare.com/v2/venues/'
+        var fsBasicUrl = 'https://api.foursquare.com/v2/venues/';
         // Credentials for the Foursquare API request URL
         var fsClientId = 'CXIHGWKSCCUBFJ0SXLYXOQ3JO0RUNRO3IFYENEHMP3ODKGZN';
         var fsClientSecret = 'TE0AJG21AFZQOC5D3MUTTGGTU0FMMLQ12AASWLPJYCGLUSFK';
@@ -224,8 +224,8 @@ var ViewModel = function() {
                 if (data.meta.code == 200 && data.response.venues.length > 0) {
                     var place = data.response.venues[0];
                     getFoursquarePlacePhoto(place.id);
-                    $('#fsInfo').append('<p>Foursquare info:</p><ul><li>' + place.location.formattedAddress[0] + '</li>'
-                        + '<li>' + place.url + '</li></ul>');
+                    $('#fsInfo').append('<p>Foursquare info:</p><ul><li>' + place.location.formattedAddress[0] +
+                        '</li>' + '<li>' + place.url + '</li></ul>');
                 }
             });
         }
@@ -250,7 +250,7 @@ var ViewModel = function() {
         if (needToggleList) {
             self.togglePlaceList();
         }
-    }
+    };
 };
 
 ko.applyBindings(new ViewModel());
