@@ -1,30 +1,36 @@
-html, body, #map, .panel {
+html, body, #map, #list-panel {
   height: 100%;
 }
 
-.panel {
+div.container {
+  width: 100%;
+  height: calc(100% - 50px);
   padding: 0;
+  position: absolute;
+  bottom: 0;
 }
 
-.panel-heading {
-  height: 8em;
-}
-
-.navbar {
-  height: 2em;
-  margin: 1px;
+#list-panel {
+  padding: 0;
 }
 
 .list-group {
   overflow: auto;
-  max-height: calc(100% - 8em - 2em);
+  max-height: calc(100% - 55px);
 }
 
 #fsImg {
-  display: table;
+  height: 100px;
+  vertical-align: middle;
 }
 
-#fsImg > img {
-  display: table-cell;
-  vertical-align: middle;
+@media (max-width: 768px) {
+
+  #map {
+    position: absolute;
+  }
+
+  .panel-active {
+    z-index: 1;
+  }
 }

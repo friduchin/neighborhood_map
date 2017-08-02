@@ -170,6 +170,13 @@ var ViewModel = function() {
         map.fitBounds(bounds);
     };
 
+    // This function toggles visibility of places list panel on small screens
+    self.togglePlaceList = function() {
+        var panel = document.getElementById('list-panel');
+        panel.classList.toggle('panel-active');
+        self.placeListToggled = true;
+    }
+
     // This function will loop through the markers and hide them all
     self.hideMarkers = function() {
         for (var i = 0; i < markers.length; i++) {
@@ -178,11 +185,12 @@ var ViewModel = function() {
     };
 
     // This function populates the infowindow when the marker is clicked
-    self.openInfoWindow = function(index) {
+    self.openInfoWindow = function(index, needToggleList = false) {
         marker = markers[index];
         infowindow.marker = marker;
-        var contentHtml = '<div class="row"><div id="fsInfo" class="col-md-8"><h4>' + marker.title + '</h4></div>';
-        contentHtml += '<div id="fsImg" class="col-md-4"></div></div>';
+        var contentHtml = '<table class="table"><thead><h4>' + marker.title + '</h4></thead>'
+        contentHtml += '<tbody><tr><td id="fsInfo" class="col-md-8"></td>';
+        contentHtml += '<td id="fsImg" class="col-md-4"></td></tr></tbody></table>';
         infowindow.setContent(contentHtml);
         // Make sure the marker property and content are cleared if the infowindow is closed
         infowindow.addListener('closeclick', function() {
@@ -231,6 +239,10 @@ var ViewModel = function() {
         getFoursquarePlaceInfo(marker);
         // Open the infowindow on the correct marker
         infowindow.open(map, marker);
+        // Hide place list on small screens if needed
+        if (needToggleList) {
+            self.togglePlaceList();
+        }
     }
 };
 
