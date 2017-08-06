@@ -250,7 +250,9 @@ var ViewModel = function() {
                 });
             }
             else {
-                var contentHtml = contentHead + '<tbody><tr><td>Place not found on Foursquare</td></tr></tbody></table>';
+                var failedHtml = contentHead + '<tbody><tr><td>Place not found on Foursquare</td></tr></tbody></table>';
+                infowindow.setContent(failedHtml);
+                infowindow.open(map, marker);
             }
         }).fail(function() {
             var contentHtml = contentHead + '<tbody><tr><td>Could not load Foursquare info</td></tr></tbody></table>';
