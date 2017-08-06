@@ -221,8 +221,10 @@ var ViewModel = function() {
         }).done(function(data) {
             if (data.meta.code == 200 && data.response.venues.length > 0) {
                 var place = data.response.venues[0];
+                var addressText = place.location.formattedAddress ? place.location.formattedAddress[0] : 'No address available';
+                var url = place.url ? place.url : 'No URL available';
                 var contentHtml = contentHead + '<tbody><tr><td><p>Foursquare info:</p><ul><li>' +
-                    place.location.formattedAddress[0] + '</li>' + '<li>' + place.url + '</li></ul></td>';
+                    addressText + '</li>' + '<li>' + url + '</li></ul></td>';
                 $.getJSON(fsBasicUrl + place.id + '/photos', {
                     client_id: fsClientId,
                     client_secret: fsClientSecret,
@@ -233,20 +235,25 @@ var ViewModel = function() {
                         contentHtml += '<td id="fsImg"><img src="' + photo.prefix + 'cap100' +
                             photo.suffix + '"></td></tr></tbody></table>';
                         infowindow.setContent(contentHtml);
-                        // Open the infowindow on the correct marker
+                        infowindow.open(map, marker);
+                    }
+                    else {
+                        contentHtml += '<td id="fsImg">No photo found on Foursquare</td></tr></tbody></table>';
+                        infowindow.setContent(contentHtml);
                         infowindow.open(map, marker);
                     }
                 }).fail(function() {
-                    contentHtml += '<td id="fsImg">Could not get photo from Foursquare</td></tr></tbody></table>';
+                    contentHtml += '<td id="fsImg">Could not get a photo from Foursquare</td></tr></tbody></table>';
                     infowindow.setContent(contentHtml);
-                    // Open the infowindow on the correct marker
                     infowindow.open(map, marker);
                 });
+            }
+            else {
+                var contentHtml = contentHead + '<tbody><tr><td>Place not found on Foursquare</td></tr></tbody></table>';
             }
         }).fail(function() {
             var contentHtml = contentHead + '<tbody><tr><td>Could not load Foursquare info</td></tr></tbody></table>';
             infowindow.setContent(contentHtml);
-            // Open the infowindow on the correct marker
             infowindow.open(map, marker);
         });
 
