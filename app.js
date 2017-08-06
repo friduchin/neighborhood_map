@@ -186,24 +186,23 @@ var ViewModel = function() {
 
     // This function populates the infowindow when the marker is clicked
     self.openInfoWindow = function(index, needToggleList = false) {
+        // Close a previously opened infowindow
+        infowindow.close();
         // Remove bounce animation from any previously selected marker
         markers.forEach(function(marker) { marker.setAnimation(null); });
 
         var marker = markers[index];
+        infowindow.marker = marker;
+
         // Add bounce animation for currently selected marker
         marker.setAnimation(google.maps.Animation.BOUNCE);
 
-        infowindow.marker = marker;
-        var contentHtml = '<table class="table"><thead><h4>' + marker.title + '</h4></thead>';
-        contentHtml += '<tbody><tr><td id="fsInfo" class="col-md-8"></td>';
-        contentHtml += '<td id="fsImg" class="col-md-4"></td></tr></tbody></table>';
-        infowindow.setContent(contentHtml);
-        // Make sure the marker property and content are cleared if the infowindow is closed
+        // Stop the marker from bouncing when the infowindow is closed
         infowindow.addListener('closeclick', function() {
             marker.setAnimation(null);
-            infowindow.setContent('');
-            infowindow.marker = null;
         });
+
+        var contentHead = '<table class="table"><thead><tr><td><h4>' + marker.title + '</h4></td></tr></thead>';
 
         // Basic Foursquare API request URL
         var fsBasicUrl = 'https://api.foursquare.com/v2/venues/';
@@ -212,40 +211,45 @@ var ViewModel = function() {
         var fsClientSecret = 'TE0AJG21AFZQOC5D3MUTTGGTU0FMMLQ12AASWLPJYCGLUSFK';
         var fsVersion = '20170730';
 
-        function getFoursquarePlaceInfo(marker) {
-            $.getJSON(fsBasicUrl + 'search', {
-                client_id: fsClientId,
-                client_secret: fsClientSecret,
-                v: fsVersion,
-                intent: 'match',
-                query: marker.title,
-                ll: marker.position.lat() + ',' + marker.position.lng()
-            }).done(function(data) {
-                if (data.meta.code == 200 && data.response.venues.length > 0) {
-                    var place = data.response.venues[0];
-                    getFoursquarePlacePhoto(place.id);
-                    $('#fsInfo').append('<p>Foursquare info:</p><ul><li>' + place.location.formattedAddress[0] +
-                        '</li>' + '<li>' + place.url + '</li></ul>');
-                }
-            });
-        }
+        $.getJSON(fsBasicUrl + 'search', {
+            client_id: fsClientId,
+            client_secret: fsClientSecret,
+            v: fsVersion,
+            intent: 'match',
+            query: marker.title,
+            ll: marker.position.lat() + ',' + marker.position.lng()
+        }).done(function(data) {
+            if (data.meta.code == 200 && data.response.venues.length > 0) {
+                var place = data.response.venues[0];
+                var contentHtml = contentHead + '<tbody><tr><td><p>Foursquare info:</p><ul><li>' +
+                    place.location.formattedAddress[0] + '</li>' + '<li>' + place.url + '</li></ul></td>';
+                $.getJSON(fsBasicUrl + place.id + '/photos', {
+                    client_id: fsClientId,
+                    client_secret: fsClientSecret,
+                    v: fsVersion
+                }).done(function(data) {
+                    if (data.response.photos.items.length > 0) {
+                        var photo = data.response.photos.items[0];
+                        contentHtml += '<td id="fsImg"><img src="' + photo.prefix + 'cap100' +
+                            photo.suffix + '"></td></tr></tbody></table>';
+                        infowindow.setContent(contentHtml);
+                        // Open the infowindow on the correct marker
+                        infowindow.open(map, marker);
+                    }
+                }).fail(function() {
+                    contentHtml += '<td id="fsImg">Could not get photo from Foursquare</td></tr></tbody></table>';
+                    infowindow.setContent(contentHtml);
+                    // Open the infowindow on the correct marker
+                    infowindow.open(map, marker);
+                });
+            }
+        }).fail(function() {
+            var contentHtml = contentHead + '<tbody><tr><td>Could not load Foursquare info</td></tr></tbody></table>';
+            infowindow.setContent(contentHtml);
+            // Open the infowindow on the correct marker
+            infowindow.open(map, marker);
+        });
 
-        function getFoursquarePlacePhoto(placeId) {
-            $.getJSON(fsBasicUrl + placeId + '/photos', {
-                client_id: fsClientId,
-                client_secret: fsClientSecret,
-                v: fsVersion
-            }).done(function(data) {
-                if (data.response.photos.items.length > 0) {
-                    var photo = data.response.photos.items[0];
-                    $('#fsImg').html('<img src="' + photo.prefix + 'cap100' + photo.suffix + '">');
-                }
-            });
-        }
-
-        getFoursquarePlaceInfo(marker);
-        // Open the infowindow on the correct marker
-        infowindow.open(map, marker);
         // Hide place list on small screens if needed
         if (needToggleList) {
             self.togglePlaceList();
