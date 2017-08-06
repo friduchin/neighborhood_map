@@ -1,4 +1,4 @@
-html, body, #map, #list-panel {
+html, body, #map, .panel {
   height: 100%;
 }
 
@@ -10,7 +10,7 @@ div.container {
   bottom: 0;
 }
 
-#list-panel {
+.panel {
   padding: 0;
 }
 
@@ -30,7 +30,7 @@ div.container {
     position: absolute;
   }
 
-  .panel-active {
+  .active {
     z-index: 1;
   }
 }

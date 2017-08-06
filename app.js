@@ -133,6 +133,9 @@ var ViewModel = function() {
 
     self.currentListMode = ko.observable(self.listModes[0]);
 
+    // Property to control visibility of places list panel on small screens
+    self.placeListActive = ko.observable(false);
+
     self.setListMode = function(mode) {
         self.currentListMode(mode);
         self.placeList(places.filter(function(item) {
@@ -172,9 +175,7 @@ var ViewModel = function() {
 
     // This function toggles visibility of places list panel on small screens
     self.togglePlaceList = function() {
-        var panel = document.getElementById('list-panel');
-        panel.classList.toggle('panel-active');
-        self.placeListToggled = true;
+        self.placeListActive() ? self.placeListActive(false) : self.placeListActive(true);
     };
 
     // This function will loop through the markers and hide them all
